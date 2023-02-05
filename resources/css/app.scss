@@ -1,0 +1,18 @@
+/* @tailwind base; */
+@tailwind components;
+@tailwind utilities;
+
+*{
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+}
+
+html{ 
+    height: 100%;
+    body {
+        margin: 0;
+        height: 100%;
+        #md-events-db-root{
+            height: 100%;
+        }
+    }
+}
