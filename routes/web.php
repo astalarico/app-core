@@ -12,7 +12,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RegisteredUserController;
 use Illuminate\Http\Request;
-use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SettingController;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\Setting;
 
@@ -72,7 +72,8 @@ Route::middleware('auth')->group(function () {
     // Data routes
     Route::get('/data/users', [UserController::class, 'index']);
     Route::put('/data/user/{id}', [UserController::class, 'update']);
-    Route::get('/data/settings', [SettingsController::class, 'index']);
-    Route::get('/data/create-api-token', [SettingsController::class, 'createApiToken']);
-    Route::post('/data/revoke-api-token', [SettingsController::class, 'revokeApiToken']);
+    Route::get('/data/settings', [SettingController::class, 'index']);
+    Route::put('/data/settings', [SettingController::class, 'update']);
+    Route::get('/data/create-api-token', [SettingController::class, 'createApiToken']);
+    Route::post('/data/revoke-api-token', [SettingController::class, 'revokeApiToken']);
 });
