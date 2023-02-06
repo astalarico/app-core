@@ -15,7 +15,6 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        info( env('ADMIN_USER_FIRST_NAME') );
         $user = User::create([
             'first_name'     => env('ADMIN_USER_FIRST_NAME'),
             'last_name'     => env('ADMIN_USER_LAST_NAME'),

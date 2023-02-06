@@ -17,7 +17,7 @@ export default function App(props) {
     return (
         <div id="md-events-db-app-container" className="flex h-full">
             <Navigation />
-            <div id="md-events-db-data" className="flex-1 p-4 border-l border-r-0 border-b-0 border-t-0 border-slate-200 border-solid">
+            <div id="md-events-db-data" className="flex-1 px-8 bg-slate-100">
                 <AppRoutes />
             </div>
         </div>

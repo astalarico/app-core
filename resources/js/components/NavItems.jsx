@@ -35,15 +35,7 @@ const navObjects = [
         label: "Settings",
         pathname: "/admin/settings",
         restricted: true,
-        icon: <IconSettings size={iconSize} stroke={1.5} />,
-        children: [
-            {
-                label: "General",
-                pathname: "/admin/settings/general",
-                icon: <IconAdjustmentsAlt size={iconSize} stroke={1.5} />,
-                childrenOffset,
-            },
-        ],
+        icon: <IconSettings size={iconSize} stroke={1.5} />
     },
 ];
 
@@ -64,24 +56,20 @@ export default function NavigationItems() {
     return (
         <div
             id="md-events-db-nav-items"
-            className="flex flex-col justify-between h-full pl-2"
+            className="flex flex-col justify-between h-full overflow-hidden items-center mx-4"
         >
             {navObjects.map((navObject, index) => {
 
                 const navIconClass = `${
                     childNavSelected || location.pathname.includes(navObject.pathname)
-                        ? "text-blue-400 bg-white"
+                        ? "text-white bg-green-400"
                         : "bg-slate-100"
                 } p-1 leading-none rounded-md`;
 
-                const active = ( location.pathname.includes(navObject.pathname) ) &&
-                !("children" in navObject);
+                const active = ( location.pathname.includes(navObject.pathname) ) 
 
                 const opened = selectedNav.includes(navObject.pathname);
-
-                console.log( active, opened, navObject.pathname, location.pathname)
-
-                const navItemClass = `flex items-center text-slate=700 ${active ? '!bg-green-400 !text-white' : 'bg-white' }  px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-500 rounded-tl-md rounded-bl-md ${opened ? 'text-blue-500' : 'text-slate-600'}`;
+                const navItemClass = `flex items-center text-slate-700 ${active ? '!bg-slate-100 !text-blue-500' : 'bg-white' } py-2 text-sm font-medium text-slate-600 hover:text-blue-500 hover:bg-slate-100 }} rounded-md`;
                 
                 return (
                     <NavItem
@@ -109,11 +97,11 @@ export default function NavigationItems() {
                             navObject.children.map((child, childIndex) => {
                                 const key = child.label + index;
                                 const active = location.pathname == child.pathname;
-                                const navItemClass = `flex items-center ${active ? '!bg-green-400 !text-white' : 'bg-white' } max-w-[190px] !ml-auto px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-500 rounded-tl-md rounded-bl-md ${active ? 'border-blue-400' : 'border-transparent' }`;
+                                const navItemClass = `rounded-md flex items-center ${active ? '!bg-white' : 'bg-white' } !px-0 py-2 text-sm font-medium text-slate-600 hover:text-blue-500 ${active ? 'border-blue-400' : 'border-transparent' } w-full`;
 
                                 const navIconClass = `${
                                     childNavSelected || location.pathname == child.pathname
-                                        ? "text-blue-400 bg-white"
+                                        ? "text-white bg-green-400"
                                         : "bg-slate-100"
                                 } p-1 leading-none rounded-md`;
                                 return (
@@ -130,6 +118,7 @@ export default function NavigationItems() {
                                         className={navItemClass}
                                         style={{
                                             paddingLeft: 12,
+                                            marginLeft: child.childrenOffset,
                                        
                                         }}
                                     />

@@ -20,9 +20,8 @@ export default function AppRoutes() {
                 <Route path="create" element={<UserForm />} />
                 <Route path="" element={<UserList />} />
             </Route>
-            <Route path="/admin/settings">
-                <Route path="general" element={<GeneralSettings />} />
-            </Route>
+            <Route path="/admin/settings" element={<GeneralSettings />} />
+  
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

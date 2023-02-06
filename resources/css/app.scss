@@ -13,6 +13,10 @@ html{
         height: 100%;
         #md-events-db-root{
             height: 100%;
+            .mantine-NavLink-children{
+                padding-left: 0;
+                width: 100%;
+            }
         }
     }
 }
