@@ -14,10 +14,6 @@ const Toast = Swal.mixin({
     showCloseButton: true,
     timer: 3000,
     timerProgressBar: false,
-    didOpen: (toast) => {
-        toast.addEventListener("mouseenter", Swal.stopTimer);
-        toast.addEventListener("mouseleave", Swal.resumeTimer);
-    },
 });
 
 export default function UserForm(props) {

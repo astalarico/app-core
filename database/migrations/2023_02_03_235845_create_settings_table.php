@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('guid');
-            $table->string('google_maps_api_key')->nullable();  
-            $table->longText('app_api_tokens')->nullable();  
+            $table->string('google_maps_api_key')->nullable()->default('');  
+            $table->longText('app_api_tokens')->nullable()->default( serialize( [] ) );  
         });
     }
 

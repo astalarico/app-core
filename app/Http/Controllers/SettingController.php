@@ -19,6 +19,9 @@ class SettingController extends Controller
     {
         $settings = Setting::orderBy('id', 'desc')->first();
         $settings->app_api_tokens = unserialize($settings->app_api_tokens);
+
+        $settings = convertNullToEmptyString($settings);
+
         return response()->json($settings);
     }
 
@@ -72,11 +75,17 @@ class SettingController extends Controller
      * @param  \App\Models\Setting  $setting
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Setting $setting)
+    public function update(Request $request, $id)
     {
-        $settings = Setting::where( "id", $request->id )->first();
-        info( $settings );
+      
+        $settings = Setting::where( "id", $id )->first();
+        $settings->update([
+            $request->setting => $request->value
+        ]);
 
+        $settings = convertNullToEmptyString( Setting::getSettings() );
+
+        return response()->json( $settings );
     }
 
     /**
@@ -95,18 +104,17 @@ class SettingController extends Controller
         $token = $request->user()->createToken('API Token');
         $settings = Setting::orderBy('id', 'desc')->first();
         $tokenObj = ["id" => $token->accessToken->id, 'bearer' => $token->plainTextToken];
+
         if (!$settings) {
             $settings = new Setting();
             $settings->app_api_tokens = serialize($tokenObj);
-            $settings->save();
         } else {
             $tokens = unserialize($settings->app_api_tokens);
-            info( $tokens );
             $tokens[] = $tokenObj;
             $settings->app_api_tokens = serialize($tokens);
-            $settings->save();
         }
 
+        $settings->save();
 
         return response()->json( Setting::getSettings() );
     }

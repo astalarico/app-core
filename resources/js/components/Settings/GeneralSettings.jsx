@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
-import { appDataState } from "../../store";
 import { TextInput, Button, Tooltip, ActionIcon } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
@@ -12,40 +10,84 @@ import {
 } from "@tabler/icons";
 import FieldLabel from "../FieldLabel";
 import "./settings.scss";
+import Swal from "sweetalert2";
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    showCloseButton: true,
+    timer: 3000,
+    timerProgressBar: false,
+});
+
 
 export default function GeneralSettings(props) {
-    const [appData, setAppData] = useRecoilState(appDataState);
-    const [settings, setSettings] = useState(appData?.settings);
+    const [ settingsId, setSettingsId ] = useState(0);
 
-    useEffect(() => {
-        setSettings(appData.settings);
-    }, [appData]);
+    useEffect( () => {
+        axios.get("/data/settings").then((response) => {
+            setSettingsId( response.data.id)
+            console.log( response.data )
+            form.setValues(response.data);
+        });
+    }, []);
 
-    const handleAddToken = () => {
+    const form = useForm({
+        initialValues: {
+            google_maps_api_key: "",
+            app_api_tokens : []
+        },
+    });
+
+    const addToken = () => {
         axios.get("/data/create-api-token").then((response) => {
-            setSettings(response.data);
+            const {app_api_tokens} = response.data;
+            setSettingsId( response.data.id)
+            form.setValues({
+                ...form.values,
+                app_api_tokens,
+            });
+
+            Toast.fire({
+                icon: 'success',
+                title: 'Api Token Added'
+            });
         });
     };
 
     const revokeToken = (token) => {
+        
         axios
             .post("/data/revoke-api-token", {
                 token,
             })
             .then((response) => {
-                setSettings(response.data);
+                const {app_api_tokens} = response.data;
+                form.setValues({
+                    ...form.values,
+                    app_api_tokens,
+                });
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'API Token Removed'
+                });
             });
     };
 
     const saveSetting = (setting) => {
         axios
-            .put("/data/settings", {
-                id : settings.id,
+            .put(`/data/settings/${settingsId}`, {
                 setting,
-                value: settings[setting],
+                value: form.values[setting],
             })
             .then((response) => {
-                //setSettings(response.data);
+                form.setValues(response.data);
+                Toast.fire({
+                    icon: 'success',
+                    title: `Settings Updated`
+                });
             });
     };
 
@@ -56,8 +98,7 @@ export default function GeneralSettings(props) {
                 <div className="field-group w-full max-w-[450px]">
                     <TextInput
                         className="w-full mb-7 p-4 bg-white rounded-md"
-                        labelProps={{ width: "100%" }}
-                        value={settings?.google_maps_api_key ?? ""}
+                        {...form.getInputProps("google_maps_api_key")}
                         label={
                             <FieldLabel
                                 Icon={IconBrandGoogleDrive}
@@ -66,6 +107,7 @@ export default function GeneralSettings(props) {
                                     <Button
                                         leftIcon={<IconDeviceFloppy />}
                                         size="xs"
+                                        color="green"
                                         onClick={() =>
                                             saveSetting("google_maps_api_key")
                                         }
@@ -76,9 +118,9 @@ export default function GeneralSettings(props) {
                             />
                         }
                         onChange={(event) =>
-                            setSettings({
-                                ...settings,
-                                google_maps_api_key: event.currentTarget.value,
+                            form.setValues({
+                                ...form.values,
+                                google_maps_api_key: event.target.value,
                             })
                         }
                         name="google_maps_api_key"
@@ -91,7 +133,8 @@ export default function GeneralSettings(props) {
                             <div className="font-bold">API Tokens</div>
                             <Button
                                 size="xs"
-                                onClick={handleAddToken}
+                                color="green"
+                                onClick={addToken}
                                 leftIcon={<IconShieldLock />}
                             >
                                 Add Token
@@ -99,7 +142,7 @@ export default function GeneralSettings(props) {
                         </div>
 
                         <div className="" id="app-api-tokens">
-                            {settings?.app_api_tokens.map((token) => {
+                            {form.values.app_api_tokens.map((token) => {
                                 return (
                                     <div
                                         className="flex items-center mb-4 w-full"

@@ -62,7 +62,7 @@ export default function NavigationItems() {
 
                 const navIconClass = `${
                     childNavSelected || location.pathname.includes(navObject.pathname)
-                        ? "text-white bg-green-400"
+                        ? "text-white bg-blue-500"
                         : "bg-slate-100"
                 } p-1 leading-none rounded-md`;
 
