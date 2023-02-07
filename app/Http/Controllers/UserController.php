@@ -17,6 +17,10 @@ class UserController extends Controller
     {
 
         $users = User::all();
+        foreach( $users as $user ){
+            $user->roles = $user->roles()->pluck('name');
+        }
+        info( $users );
         return response()->json($users);
     }
 
