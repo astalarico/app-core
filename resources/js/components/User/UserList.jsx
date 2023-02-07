@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { TextInput, Button, Tooltip, ActionIcon } from "@mantine/core";
 import { IconSearch, IconPlus, IconTrash, IconEdit } from "@tabler/icons";
+import { useNavigate } from "react-router-dom";
 
 export default function UserList(props) {
     const [users, setUsers] = useState([]);
-
+    const navigate = useNavigate();
+    
     useEffect(() => {
         axios("/data/users").then((response) => {
             setUsers(response.data);
@@ -46,41 +48,41 @@ export default function UserList(props) {
                     }
                 />
             </div>
-            <div id="app-db-user-list-container" className="rounded-md ">
+            <div id="app-db-user-list-container" className="rounded-md max-w-[950px]">
                 <div className="app-db-list-header flex p-4 mb-2 ">
                     <div className="app-db-list-header-item flex-1 max-w-[200px]">
                         First Name
                     </div>
-                    <div className="app-db-list-header-item flex-1 max-w-[200px]">
+                    <div className="app-db-list-header-item flex-1 max-w-[250px]">
                         Last Name
                     </div>
                     <div className="app-db-list-header-item flex-1 max-w-[250px]">Email</div>
                     <div className="app-db-list-header-item flex-1 max-w-[200px]">Role</div>
-                    <div className="app-db-list-header-item flex-1 max-w-[100px]">
+                    <div className="app-db-list-header-item flex-1 max-w-[65px]">
                         Actions
                     </div>
                 </div>
-                <div id="app-db-user-list-data" className="max-h-[400px]">
+                <div id="app-db-user-list-data" className="max-h-[400px] overflow-y-auto">
                     {users.map((user) => (
-                        <a
+                        <div
                             key={user.id}
-                            className="items-center border border-solid border-transparent rounded-md flex p-4 hover:border-blue-400 bg-white"
-                            href={`/admin/users/${user.id}/edit`}
+                            className="items-center border border-solid border-transparent rounded-md flex px-4 py-2 my-2 hover:border-blue-400 bg-white"
+
                         >
                             <div className="flex-1 max-w-[200px]">{user.first_name}</div>
-                            <div className="flex-1 max-w-[200px]">{user.last_name}</div>
+                            <div className="flex-1 max-w-[250px]">{user.last_name}</div>
                             <div className="flex-1 max-w-[250px]">{user.email}</div>
                             <div className="flex-1 max-w-[200px]">
                                 {user.roles.map((role, index) => (
                                     <span key={index}>{role}</span>
                                 ))}
                             </div>
-                            <div className="flex-1 max-w-[100px] flex">
+                            <div className="flex-1 max-w-[65px] flex">
                                 <Tooltip label="Edit User">
                                     <ActionIcon
-                                        onClick={() => editUser(user.id)}
+                                        onClick={() => navigate(`/admin/users/${user.id}/edit`)}
                                         color="blue"
-                                        variant="filled"
+                                        variant="subtle"
                                         className="mr-2"
                                     >
                                         <IconEdit />
@@ -90,13 +92,13 @@ export default function UserList(props) {
                                     <ActionIcon
                                         onClick={() => deleteUser(user.id)}
                                         color="red"
-                                        variant="filled"
+                                        variant="subtle"
                                     >
                                         <IconTrash />
                                     </ActionIcon>
                                 </Tooltip>
                             </div>
-                        </a>
+                        </div>
                     ))}
                 </div>
             </div>
