@@ -75,4 +75,5 @@ Route::middleware('auth')->group(function () {
     Route::put('/data/settings/{id?}', [SettingController::class, 'update']);
     Route::get('/data/create-api-token', [SettingController::class, 'createApiToken']);
     Route::post('/data/revoke-api-token', [SettingController::class, 'revokeApiToken']);
+    Route::get('/data/dashboard', [DashboardController::class, 'index']);
 });
