@@ -4,7 +4,7 @@ import { useRecoilState } from "recoil";
 import { appDataState } from "../../store";
 import { IconDeviceFloppy } from "@tabler/icons";
 import { useForm } from "@mantine/form";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate} from "react-router-dom";
 import Swal from "sweetalert2";
 
 const Toast = Swal.mixin({
@@ -18,8 +18,10 @@ const Toast = Swal.mixin({
 
 export default function UserForm(props) {
     const [appData, setAppData] = useRecoilState(appDataState);
-
+    const navigate = useNavigate();
     const { id } = useParams();
+    const location = useLocation();
+    const screen = location.pathname.includes('create') ? 'create' : 'edit';
 
     const form = useForm({
         initialValues: {
@@ -32,6 +34,14 @@ export default function UserForm(props) {
             first_name: (value) => value.length > 0 ? null : "First Name is required",
             last_name: (value) => value.length > 0 ? null : "Last Name is required",
             email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+            password: (value) => {
+                if( screen == 'edit' || value.length > 0){
+                    return null;
+                }else{
+                    return "Password is required";
+                }
+    
+            },
         },
     });
 
@@ -49,7 +59,7 @@ export default function UserForm(props) {
    
         const validation = form.validate();
      
-        if( ! validation.hasErrors ){
+        if( ! validation.hasErrors && screen == 'edit'){
         
             axios.put(`/data/users/${id}`, form.values).then((response) => {
                 const { data } = response;
@@ -64,6 +74,25 @@ export default function UserForm(props) {
                     icon: 'success',
                     title: 'User Profile Updated'
                 })
+            });
+        }
+
+        if( ! validation.hasErrors && screen == 'create'){
+            axios.post(`/data/users`, form.values).then((response) => {
+                const { data } = response;
+        
+                if (!("password" in data)) {
+                    data.password = "";
+                }
+
+                form.setValues(data);
+
+                Toast.fire({
+                    icon: 'success',
+                    title: 'User Profile Created'
+                })
+
+                navigate(`/admin/users/${data.id}/edit`);
             });
         }
     };
@@ -95,7 +124,7 @@ export default function UserForm(props) {
                 </div>
 
                 <TextInput
-                    disabled
+                    disabled={screen === 'edit'}
                     label="Email"
                     name="email"
                     withAsterisk
