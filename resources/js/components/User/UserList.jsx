@@ -1,22 +1,50 @@
 import React, { useEffect, useState } from "react";
-import { TextInput, Button, Tooltip, ActionIcon } from "@mantine/core";
+import { TextInput, Button, Tooltip, ActionIcon, Loader } from "@mantine/core";
 import { IconSearch, IconPlus, IconTrash, IconEdit } from "@tabler/icons";
 import { useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { appDataState } from "../../store";
 
 export default function UserList(props) {
     const [users, setUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [search, setSearch] = useState("");
+    const appData = useRecoilValue(appDataState);
     const navigate = useNavigate();
-    
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         axios("/data/users").then((response) => {
             setUsers(response.data);
+            setFilteredUsers(response.data);
+            setLoading(false);
         });
     }, []);
 
     const deleteUser = (id) => {
         axios.delete(`/data/users/${id}`).then((response) => {
-            setUsers(users.filter((user) => user.id !== id));
+            setUsers(response.data);
         });
+    };
+
+    const filterUsers = (search) => {
+        setSearch(search);
+        if (search.length > 0) {
+            const filtered = users.filter((user) => {
+                return (
+                    user.first_name
+                        .toLowerCase()
+                        .includes(search.toLowerCase()) ||
+                    user.last_name
+                        .toLowerCase()
+                        .includes(search.toLowerCase()) ||
+                    user.email.toLowerCase().includes(search.toLowerCase())
+                );
+            });
+            setFilteredUsers(filtered);
+        } else {
+            setFilteredUsers(users);
+        }
     };
 
     return (
@@ -40,6 +68,8 @@ export default function UserList(props) {
                 <TextInput
                     placeholder="Search Users"
                     className="w-full max-w-[300px]"
+                    value={search}
+                    onChange={(e) => filterUsers(e.target.value)}
                     label={
                         <div className="flex items-center">
                             <IconSearch className="mr-2" />
@@ -48,59 +78,95 @@ export default function UserList(props) {
                     }
                 />
             </div>
-            <div id="app-db-user-list-container" className="rounded-md max-w-[950px]">
-                <div className="app-db-list-header flex p-4 mb-2 ">
-                    <div className="app-db-list-header-item flex-1 max-w-[200px]">
+            <div
+                id="app-db-user-list-container"
+                className="rounded-md max-w-[1075px]"
+            >
+                <div className="app-db-list-header flex p-4 mb-1 font-bold ">
+                    <div className="app-db-list-header-item flex-1 max-w-[200px] px-1">
                         First Name
                     </div>
-                    <div className="app-db-list-header-item flex-1 max-w-[250px]">
+                    <div className="app-db-list-header-item flex-1 max-w-[250px] px-1">
                         Last Name
                     </div>
-                    <div className="app-db-list-header-item flex-1 max-w-[250px]">Email</div>
-                    <div className="app-db-list-header-item flex-1 max-w-[200px]">Role</div>
-                    <div className="app-db-list-header-item flex-1 max-w-[65px]">
+                    <div className="app-db-list-header-item flex-1 max-w-[330px] px-1">
+                        Email
+                    </div>
+                    <div className="app-db-list-header-item flex-1 max-w-[200px] px-1">
+                        Role
+                    </div>
+                    <div className="app-db-list-header-item flex-1 max-w-[65px] px-1">
                         Actions
                     </div>
                 </div>
-                <div id="app-db-user-list-data" className="max-h-[400px] overflow-y-auto">
-                    {users.map((user) => (
-                        <div
-                            key={user.id}
-                            className="items-center border border-solid border-transparent rounded-md flex px-4 py-2 my-2 hover:border-blue-400 bg-white"
+                {loading && (
+                    <div className="flex justify-center">
+                        <Loader className="text-center" />
+                    </div>
+                )}
+                {!loading && (
+                    <div
+                        id="app-db-user-list-data"
+                        className="max-h-[400px] overflow-y-auto"
+                    >
+                        {filteredUsers.map((user) => {
+                            console.log( user )
+                            return (
+                                <div
+                                    key={user.id}
+                                    className="items-center border border-solid border-transparent rounded-md flex px-4 py-2 my-1 hover:border-blue-400 bg-white"
+                                >
+                                    <div className="flex-1 max-w-[200px] px-1">
+                                        {user.first_name}
+                                    </div>
+                                    <div className="flex-1 max-w-[250px] px-1">
+                                        {user.last_name}
+                                    </div>
+                                    <div className="flex-1 max-w-[330px] px-1">
+                                        <a href={`mailto:${user.email}`}>
+                                            {user.email}
+                                        </a>
+                                    </div>
+                                    <div className="flex-1 max-w-[200px] px-1">
+                                        {user.roles.map((role, index) => (
+                                            <span key={index}>{role}</span>
+                                        ))}
+                                    </div>
+                                    <div className="flex-1 max-w-[65px] flex px-1">
+                                        <Tooltip label="Edit User">
+                                            <ActionIcon
+                                                onClick={() =>
+                                                    navigate(
+                                                        `/admin/users/${user.id}/edit`
+                                                    )
+                                                }
+                                                color="blue"
+                                                variant="subtle"
+                                                className="mr-2"
+                                            >
+                                                <IconEdit />
+                                            </ActionIcon>
+                                        </Tooltip>
 
-                        >
-                            <div className="flex-1 max-w-[200px]">{user.first_name}</div>
-                            <div className="flex-1 max-w-[250px]">{user.last_name}</div>
-                            <div className="flex-1 max-w-[250px]">{user.email}</div>
-                            <div className="flex-1 max-w-[200px]">
-                                {user.roles.map((role, index) => (
-                                    <span key={index}>{role}</span>
-                                ))}
-                            </div>
-                            <div className="flex-1 max-w-[65px] flex">
-                                <Tooltip label="Edit User">
-                                    <ActionIcon
-                                        onClick={() => navigate(`/admin/users/${user.id}/edit`)}
-                                        color="blue"
-                                        variant="subtle"
-                                        className="mr-2"
-                                    >
-                                        <IconEdit />
-                                    </ActionIcon>
-                                </Tooltip>
-                                <Tooltip label="Delete User">
-                                    <ActionIcon
-                                        onClick={() => deleteUser(user.id)}
-                                        color="red"
-                                        variant="subtle"
-                                    >
-                                        <IconTrash />
-                                    </ActionIcon>
-                                </Tooltip>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                                        {appData.user?.id !== user.id && (
+                                            <Tooltip label="Delete User">
+                                                <ActionIcon
+                                                    onClick={() =>
+                                                        deleteUser(user.id)
+                                                    }
+                                                    color="red"
+                                                    variant="subtle"
+                                                >
+                                                    <IconTrash />
+                                                </ActionIcon>
+                                            </Tooltip>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );
