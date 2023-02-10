@@ -7,17 +7,20 @@ import {
     IconTrash,
     IconShieldLock,
     IconWriting,
-    IconPhotoUp
+    IconPhotoUp,
 } from "@tabler/icons";
 import FieldLabel from "../FieldLabel";
 import "./settings.scss";
 import Swal from "sweetalert2";
 import { Grid } from "@mantine/core";
 import { FilePond, registerPlugin } from "react-filepond";
-import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond/dist/filepond.min.css";
-import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import SaveButton from "../SaveButton";
+import { useRecoilState } from "recoil";
+import { appDataState } from "../../store";
+
 registerPlugin(FilePondPluginImagePreview);
 
 const Toast = Swal.mixin({
@@ -32,14 +35,25 @@ const Toast = Swal.mixin({
 export default function GeneralSettings(props) {
     const [settingsId, setSettingsId] = useState(0);
     const [files, setFiles] = useState([]);
+    const [appData, setAppData] = useRecoilState(appDataState);
 
     useEffect(() => {
+
         axios.get("/data/settings").then((response) => {
-            console.log( response.data )
+      
+            console.log( response.data)
+            setFiles([
+                {
+                    source: response.data.app_logo.url,
+                        type: "local",
+                    },
+                
+            ]);
+
             setSettingsId(response.data.id);
             form.setValues(response.data);
         });
-    }, []);
+    }, [appData]);
 
     const form = useForm({
         initialValues: {
@@ -87,30 +101,33 @@ export default function GeneralSettings(props) {
     const saveSetting = (setting) => {
         var formData = new FormData();
 
-        if( setting === 'app_logo' ){
-            formData.append('value', form.values[setting] , form.values[setting].name );
-        }else{
-            formData.append('value', form.values[setting]);
+        if (setting === "app_logo") {
+            formData.append(
+                "value",
+                form.values[setting],
+                form.values[setting].name
+            );
+        } else {
+            formData.append("value", form.values[setting]);
         }
 
-        formData.append('setting', setting );
-        
+        formData.append("setting", setting);
+
         formData.append("_method", "put");
         axios({
             url: `/data/settings/${settingsId}`,
-                method: "POST",
-                data: formData,
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            })
-            .then((response) => {
-                form.setValues(response.data);
-                Toast.fire({
-                    icon: "success",
-                    title: `Settings Updated`,
-                });
+            method: "POST",
+            data: formData,
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }).then((response) => {
+            form.setValues(response.data);
+            Toast.fire({
+                icon: "success",
+                title: `Settings Updated`,
             });
+        });
     };
 
     const updateFormValues = (setting, value) => {
@@ -132,28 +149,41 @@ export default function GeneralSettings(props) {
                             <FieldLabel
                                 Icon={IconWriting}
                                 label="App Name"
-                                SaveButton={<SaveButton saveSetting={saveSetting} settingKey={"app_name"} />}
+                                SaveButton={
+                                    <SaveButton
+                                        saveSetting={saveSetting}
+                                        settingKey={"app_name"}
+                                    />
+                                }
                             />
                         }
-                        onChange={(event) => updateFormValues('app_name', event.target.value)}
+                        onChange={(event) =>
+                            updateFormValues("app_name", event.target.value)
+                        }
                         name="app_name"
                     />
                     <div className="file-upload-wrapper max-w-md bg-white p-4 rounded-md mb-7">
                         <FieldLabel
                             Icon={IconPhotoUp}
                             label="App Logo"
-                            SaveButton={<SaveButton saveSetting={saveSetting} settingKey={"app_logo"} />}
+                            SaveButton={
+                                <SaveButton
+                                    saveSetting={saveSetting}
+                                    settingKey={"app_logo"}
+                                />
+                            }
                         />
                         <FilePond
                             files={files}
-                            onupdatefiles={ (fileItems) => {
-                                const fileObjects = fileItems.map(fileItem => fileItem.file);
-                                setFiles(fileObjects)
-                                console.log( fileObjects[0])
-                                updateFormValues('app_logo', fileObjects[0])
+                            onupdatefiles={(fileItems) => {
+                                const fileObjects = fileItems.map(
+                                    (fileItem) => fileItem.file
+                                );
+                                setFiles(fileObjects);
+                                updateFormValues("app_logo", fileObjects[0]);
                             }}
+                            server={{ load: (src, load) => fetch(src).then(res => res.blob()).then(load)  }}
                             allowMultiple={false}
-        
                             name="files" /* sets the file input name, it's filepond by default */
                             labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
                         />
@@ -165,10 +195,20 @@ export default function GeneralSettings(props) {
                             <FieldLabel
                                 Icon={IconBrandGoogleDrive}
                                 label="Google Maps API Key"
-                                SaveButton={<SaveButton saveSetting={saveSetting} settingKey={"google_maps_api_key"} />}
+                                SaveButton={
+                                    <SaveButton
+                                        saveSetting={saveSetting}
+                                        settingKey={"google_maps_api_key"}
+                                    />
+                                }
                             />
                         }
-                        onChange={(event) => updateFormValues('google_maps_api_key', event.target.value)}
+                        onChange={(event) =>
+                            updateFormValues(
+                                "google_maps_api_key",
+                                event.target.value
+                            )
+                        }
                     />
                 </Grid.Col>
                 <Grid.Col lg={6} md={12}>

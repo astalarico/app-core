@@ -20,9 +20,12 @@ class SettingController extends Controller
         $settings = Setting::orderBy('id', 'desc')->first();
         $settings->app_api_tokens = unserialize($settings->app_api_tokens);
         $settings->getMedia('app_logo');
-
+        $settings->app_logo = array(
+            "url" => url('/') . $settings->getFirstMediaUrl('app_logo'), 
+            "fileName" => $settings->getFirstMedia('app_logo')->custom_properties['fileName']
+        );
         $settings = convertNullToEmptyString($settings);
-
+        info($settings->getFirstMedia('app_logo')->custom_properties['fileName']);
         return response()->json($settings);
     }
 
@@ -83,7 +86,7 @@ class SettingController extends Controller
 
         if ($request->hasFile('value')) {
             info($request->value);
-            
+
             // delete existing app logo before processing the new one
             $settings->clearMediaCollection('app_logo');
 

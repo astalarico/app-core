@@ -65,7 +65,8 @@ Route::middleware('auth')->group(function () {
   
         return response()->json([
             'user' => $user,
-            'settings' => $settings
+            'settings' => $settings,
+            'appUrl' => url('/'),
         ]);
     });
 
