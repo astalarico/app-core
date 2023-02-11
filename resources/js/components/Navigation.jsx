@@ -8,31 +8,34 @@ import { NavLink } from "react-router-dom";
 import { useClickOutside } from "@mantine/hooks";
 
 export default function NavigationItems() {
-
     const appData = useRecoilValue(appDataState);
     const [profileTagOpened, setProfileTagOpened] = useState(false);
     const profileNavTagRef = useClickOutside(() => setProfileTagOpened(false));
-    console.log( appData )
+    console.log(appData);
     return (
         <div id="md-events-db-nav" className="w-[250px] h-full">
             <div
                 id="md-events-db-logo"
-                className="p-2 flex justify-center max-h-[150px] mb-2"
+                className="p-2 pt-4 flex justify-center max-h-[150px] mb-2"
             >
-                <img
-                    src={appData.settings?.app_logo}
-                    alt=""
-                    className="max-w-full h-[85px]"
-                />
-                {!appData.settings?.app_logo && (
-                    <h1 className="text-2xl font-bold text-slate-800">
-                        Logo Here
-                    </h1>
-                )}
+                <>
+                    {appData.settings?.app_logo && (
+                        <img
+                            src={appData.settings?.app_logo}
+                            alt=""
+                            className="max-w-full h-[90px]"
+                        />
+                    )}
+                    {!appData.settings?.app_logo && (
+                        <div className="text-2xl font-bold text-slate-800 p-4 border-1 border-dashed border-slate-300 max-h-full h-[90px] flex items-center">
+                            Logo Here
+                        </div>
+                    )}
+                </>
             </div>
             <div
                 id="md-events-db-nav-inner"
-                className="flex flex-col justify-between h-[calc(100%-6.4rem)]"
+                className="flex flex-col justify-between h-[calc(100%-124px)]"
             >
                 <div className="md-events-db-nav-wrapper">
                     <NavItems />

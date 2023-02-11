@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TextInput, Button, Tooltip, ActionIcon } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useDidUpdate } from '@mantine/hooks';
+
 import {
     IconBrandGoogleDrive,
     IconKey,
@@ -9,6 +9,9 @@ import {
     IconShieldLock,
     IconWriting,
     IconPhotoUp,
+    IconAffiliate,
+    IconApiApp,
+    IconPlus,
 } from "@tabler/icons";
 import FieldLabel from "../FieldLabel";
 import "./settings.scss";
@@ -148,12 +151,12 @@ export default function GeneralSettings(props) {
     };
 
     return (
-        <div id="md-events-db-settings">
+        <div id="md-events-db-settings" className="max-w-md lg:max-w-6xl">
             <h2>General Settings</h2>
             <Grid>
-                <Grid.Col md={5} className="max-w-[400px]">
+                <Grid.Col md={5} className="max-w-[350px] lg:max-w-lg">
                     <TextInput
-                        className="max-w-md mb-7 p-4 bg-white rounded-md"
+                        className="mb-7 p-4 bg-white rounded-md"
                         {...form.getInputProps("app_name")}
                         label={
                             <FieldLabel
@@ -172,7 +175,7 @@ export default function GeneralSettings(props) {
                         }
                         name="app_name"
                     />
-                    <div className="file-upload-wrapper max-w-md bg-white p-4 rounded-md mb-7">
+                    <div className="file-upload-wrapper  bg-white p-4 rounded-md mb-7">
                         <FieldLabel
                             Icon={IconPhotoUp}
                             label="App Logo"
@@ -204,7 +207,7 @@ export default function GeneralSettings(props) {
                         />
                     </div>
                     <TextInput
-                        className="max-w-md mb-7 p-4 bg-white rounded-md"
+                        className=" mb-7 p-4 bg-white rounded-md"
                         {...form.getInputProps("google_maps_api_key")}
                         label={
                             <FieldLabel
@@ -226,21 +229,27 @@ export default function GeneralSettings(props) {
                         }
                     />
                 </Grid.Col>
-                <Grid.Col md={6}>
+                <Grid.Col md={6} className="max-w-[350px] lg:max-w-lg">
                     <div
                         id="app-api-tokens-list"
-                        className="bg-white px-4 pt-4 pb-2 rounded-md max-w-[350px] lg:max-w-lg "
+                        className="bg-white px-4 pt-4 pb-2 rounded-md mb-7 min-h-[95px]"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <div className="font-bold">API Tokens</div>
-                            <Button
-                                size="xs"
-                                color="green"
-                                onClick={addToken}
-                                leftIcon={<IconShieldLock />}
-                            >
-                                Add Token
-                            </Button>
+                        <FieldLabel
+                                Icon={IconShieldLock}
+                                label="API Tokens"
+                                SaveButton={
+                                    <Button
+                                    size="xs"
+                                    color="green"
+                                    onClick={addToken}
+                                    leftIcon={<IconPlus />}
+                                >
+                                    Add Token
+                                </Button>
+                                }
+                            />
+                      
                         </div>
 
                         <div className="" id="app-api-tokens">
@@ -279,6 +288,28 @@ export default function GeneralSettings(props) {
                             })}
                         </div>
                     </div>
+                    <TextInput
+                        className=" mb-7 p-4 bg-white rounded-md"
+                        {...form.getInputProps("open_ai_key")}
+                        label={
+                            <FieldLabel
+                                Icon={IconAffiliate}
+                                label="Open AI Key"
+                                SaveButton={
+                                    <SaveButton
+                                        saveSetting={saveSetting}
+                                        settingKey={"open_ai_key"}
+                                    />
+                                }
+                            />
+                        }
+                        onChange={(event) =>
+                            updateFormValues(
+                                "google_maps_api_key",
+                                event.target.value
+                            )
+                        }
+                    />
                 </Grid.Col>
             </Grid>
         </div>

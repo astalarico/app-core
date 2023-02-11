@@ -21,6 +21,7 @@ return new class extends Migration
             $table->longText('app_api_tokens')->nullable();
             $table->string('app_name')->nullable()->default('');
             $table->string('app_logo')->nullable()->default('');
+            $table->string('open_ai_key')->nullable()->default('');
         });
     }
 
