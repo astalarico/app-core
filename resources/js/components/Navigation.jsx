@@ -13,11 +13,10 @@ export default function NavigationItems() {
     const [profileTagOpened, setProfileTagOpened] = useState(false);
     const profileNavTagRef = useClickOutside(() => setProfileTagOpened(false));
 
-
     return (
         <div id="md-events-db-nav" className="w-[250px]">
-            <div id="md-events-db-logo" className="py-6 px-2">
-                logo
+            <div id="md-events-db-logo" className="p-2">
+                <img src={appData.settings?.app_logo} alt="" className="max-w-full"/>
             </div>
             <div
                 id="md-events-db-nav-inner"

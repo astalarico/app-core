@@ -19,6 +19,8 @@ import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import SaveButton from "../SaveButton";
+import { useRecoilState } from "recoil";
+import { appDataState } from "@/store";
 
 registerPlugin(FilePondPluginImagePreview);
 
@@ -32,7 +34,7 @@ const Toast = Swal.mixin({
 });
 
 export default function GeneralSettings(props) {
-    
+    const [ appData, setAppData ] = useRecoilState(appDataState)
     const [settingsId, setSettingsId] = useState(0);
     const [files, setFiles] = useState([]);
     const [ settings, setSettings ] = useState({});
@@ -128,6 +130,10 @@ export default function GeneralSettings(props) {
             },
         }).then((response) => {
             form.setValues(response.data);
+            setAppData({
+                ...appData,
+                settings: response.data,
+            })
             Toast.fire({
                 icon: "success",
                 title: `Settings Updated`,
@@ -145,7 +151,7 @@ export default function GeneralSettings(props) {
         <div id="md-events-db-settings">
             <h2>General Settings</h2>
             <Grid>
-                <Grid.Col lg={5} md={12}>
+                <Grid.Col lg={5} md={12} className="max-w-[400px]">
                     <TextInput
                         className="max-w-md mb-7 p-4 bg-white rounded-md"
                         {...form.getInputProps("app_name")}
