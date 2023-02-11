@@ -19,14 +19,13 @@ class SettingController extends Controller
     {
         $settings = Setting::orderBy('id', 'desc')->first();
         $settings->app_api_tokens = unserialize($settings->app_api_tokens);
-        $settings->getMedia('app_logo');
-        
+   
         if( $settings->getFirstMedia('app_logo') ) {
             $settings->app_logo = url('/') . $settings->getFirstMediaUrl('app_logo');
         }
 
         $settings = convertNullToEmptyString($settings);
-        unset($settings->media );
+   
         return response()->json($settings);
     }
 
@@ -82,15 +81,14 @@ class SettingController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         $settings = Setting::where("id", $id)->first();
 
-        if ($request->hasFile('value')) {
-            info($request->value);
-
+        if( $request->setting == "app_logo"){
             // delete existing app logo before processing the new one
             $settings->clearMediaCollection('app_logo');
+        }
 
+        if ($request->hasFile('value')) {
             $originalName = $request->value->getClientOriginalName();
             $imagePath = $request->value->store('public/media');
             $fileName = substr($imagePath, strrpos($imagePath, '/') + 1);
@@ -99,11 +97,6 @@ class SettingController extends Controller
                 ->addMedia(storage_path('app/public/media/' . $fileName))
                 ->withCustomProperties(['fileName' => $originalName])
                 ->toMediaCollection('app_logo');
-
-
-            // $logoPath = $request['data']['featured_image']->store('public/media');
-            // $fileName = substr($logoPath, strrpos($logoPath, '/') + 1);
-            // $data['featured_image'] = $fileName;
         }
 
         $settings->update([

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TextInput, Button, Tooltip, ActionIcon } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useDidUpdate } from '@mantine/hooks';
 import {
     IconBrandGoogleDrive,
     IconKey,
@@ -31,6 +32,7 @@ const Toast = Swal.mixin({
 });
 
 export default function GeneralSettings(props) {
+    
     const [settingsId, setSettingsId] = useState(0);
     const [files, setFiles] = useState([]);
     const [ settings, setSettings ] = useState({});
@@ -47,7 +49,8 @@ export default function GeneralSettings(props) {
     useEffect(() => {
         axios.get("/data/settings").then((response) => {
             setSettings(response.data);
-            if (response.data.app_logo) {
+     
+            if (response.data.app_logo && response.data.app_logo !== "undefined") {
                 setFiles([
                     {
                         source: response.data.app_logo,
@@ -65,7 +68,6 @@ export default function GeneralSettings(props) {
       
     }, [settings,files]);
 
-    console.log(form.values);
     const addToken = () => {
         axios.get("/data/create-api-token").then((response) => {
             const { app_api_tokens } = response.data;
@@ -104,7 +106,7 @@ export default function GeneralSettings(props) {
     const saveSetting = (setting) => {
         var formData = new FormData();
 
-        if (setting === "app_logo") {
+        if (setting === "app_logo" && form.values[setting]) {
             formData.append(
                 "value",
                 form.values[setting],
@@ -135,7 +137,6 @@ export default function GeneralSettings(props) {
 
     const updateFormValues = (setting, value) => {
         form.setValues({
-            ...form.values,
             [setting]: value,
         });
     };
