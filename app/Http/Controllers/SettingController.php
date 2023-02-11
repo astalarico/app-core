@@ -20,12 +20,13 @@ class SettingController extends Controller
         $settings = Setting::orderBy('id', 'desc')->first();
         $settings->app_api_tokens = unserialize($settings->app_api_tokens);
         $settings->getMedia('app_logo');
-        $settings->app_logo = array(
-            "url" => url('/') . $settings->getFirstMediaUrl('app_logo'), 
-            "fileName" => $settings->getFirstMedia('app_logo')->custom_properties['fileName']
-        );
+        
+        if( $settings->getFirstMedia('app_logo') ) {
+            $settings->app_logo = url('/') . $settings->getFirstMediaUrl('app_logo');
+        }
+
         $settings = convertNullToEmptyString($settings);
-        info($settings->getFirstMedia('app_logo')->custom_properties['fileName']);
+        unset($settings->media );
         return response()->json($settings);
     }
 

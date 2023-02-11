@@ -18,8 +18,6 @@ import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import SaveButton from "../SaveButton";
-import { useRecoilState } from "recoil";
-import { appDataState } from "../../store";
 
 registerPlugin(FilePondPluginImagePreview);
 
@@ -35,34 +33,39 @@ const Toast = Swal.mixin({
 export default function GeneralSettings(props) {
     const [settingsId, setSettingsId] = useState(0);
     const [files, setFiles] = useState([]);
-    const [appData, setAppData] = useRecoilState(appDataState);
-
-    useEffect(() => {
-
-        axios.get("/data/settings").then((response) => {
-      
-            console.log( response.data)
-            setFiles([
-                {
-                    source: response.data.app_logo.url,
-                        type: "local",
-                    },
-                
-            ]);
-
-            setSettingsId(response.data.id);
-            form.setValues(response.data);
-        });
-    }, [appData]);
+    const [ settings, setSettings ] = useState({});
 
     const form = useForm({
         initialValues: {
             app_name: "",
             google_maps_api_key: "",
             app_api_tokens: [],
+            app_logo: "",
         },
     });
 
+    useEffect(() => {
+        axios.get("/data/settings").then((response) => {
+            setSettings(response.data);
+            if (response.data.app_logo) {
+                setFiles([
+                    {
+                        source: response.data.app_logo,
+                        type: "local",
+                    },
+                ]);
+            }
+            setSettingsId(response.data.id);
+            form.setValues(response.data);
+        });
+    }, []);
+   
+    useEffect(() => {
+     
+      
+    }, [settings,files]);
+
+    console.log(form.values);
     const addToken = () => {
         axios.get("/data/create-api-token").then((response) => {
             const { app_api_tokens } = response.data;
@@ -112,8 +115,8 @@ export default function GeneralSettings(props) {
         }
 
         formData.append("setting", setting);
-
         formData.append("_method", "put");
+
         axios({
             url: `/data/settings/${settingsId}`,
             method: "POST",
@@ -182,7 +185,12 @@ export default function GeneralSettings(props) {
                                 setFiles(fileObjects);
                                 updateFormValues("app_logo", fileObjects[0]);
                             }}
-                            server={{ load: (src, load) => fetch(src).then(res => res.blob()).then(load)  }}
+                            server={{
+                                load: (src, load) =>
+                                    fetch(src)
+                                        .then((res) => res.blob())
+                                        .then(load),
+                            }}
                             allowMultiple={false}
                             name="files" /* sets the file input name, it's filepond by default */
                             labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
