@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import NavItems from "./NavItems";
-import { MediaQuery, Drawer, Button, Popover } from "@mantine/core";
+import { Popover } from "@mantine/core";
 import { IconUserCircle, IconAddressBook, IconLogout } from "@tabler/icons";
 import { appDataState } from "@/store";
 import { useRecoilValue } from "recoil";
@@ -8,54 +8,39 @@ import { NavLink } from "react-router-dom";
 import { useClickOutside } from "@mantine/hooks";
 
 export default function NavigationItems() {
-    const [navDrawerOpened, setNavDrawerOpened] = useState(false);
+
     const appData = useRecoilValue(appDataState);
     const [profileTagOpened, setProfileTagOpened] = useState(false);
     const profileNavTagRef = useClickOutside(() => setProfileTagOpened(false));
-
+    console.log( appData )
     return (
-        <div id="md-events-db-nav" className="w-[250px]">
-            <div id="md-events-db-logo" className="p-2">
-                <img src={appData.settings?.app_logo} alt="" className="max-w-full"/>
+        <div id="md-events-db-nav" className="w-[250px] h-full">
+            <div
+                id="md-events-db-logo"
+                className="p-2 flex justify-center max-h-[150px] mb-2"
+            >
+                <img
+                    src={appData.settings?.app_logo}
+                    alt=""
+                    className="max-w-full h-[85px]"
+                />
+                {!appData.settings?.app_logo && (
+                    <h1 className="text-2xl font-bold text-slate-800">
+                        Logo Here
+                    </h1>
+                )}
             </div>
             <div
                 id="md-events-db-nav-inner"
-                className="flex flex-col justify-between h-[calc(100%-4.1rem)]"
+                className="flex flex-col justify-between h-[calc(100%-6.4rem)]"
             >
-                <MediaQuery
-                    query="(max-width: 1024px)"
-                    styles={{
-                        display: "none",
-                    }}
-                >
-                    <div className="md-events-db-nav-wrapper" >
-                        <NavItems />
-                    </div>
-                </MediaQuery>
-                <MediaQuery
-                    query="(min-width: 1024px)"
-                    styles={{
-                        display: "none",
-                    }}
-                >
-                    <div className="md-events-db-nav-wrapper">
-                        <Button onClick={() => setNavDrawerOpened(true)}>
-                            Nav
-                        </Button>
-                        <Drawer
-                            opened={navDrawerOpened}
-                            onClose={() => setNavDrawerOpened(false)}
-                            title="Register"
-                            padding="xl"
-                            size="xl"
-                        >
-                            <NavItems />
-                        </Drawer>
-                    </div>
-                </MediaQuery>
+                <div className="md-events-db-nav-wrapper">
+                    <NavItems />
+                </div>
+
                 <div id="events-db-profile" className="p-4">
                     <Popover
-                        width="target" 
+                        width="target"
                         opened={profileTagOpened}
                         shadow="md"
                         withArrow
@@ -75,16 +60,12 @@ export default function NavigationItems() {
                                         {appData.user?.first_name}
                                     </div>
                                     <div className="text-sm text-slate-500">
-                                        {appData.user?.roles[0]}
+                                        {appData.user?.roles}
                                     </div>
                                 </div>
                             </div>
                         </Popover.Target>
-                        <Popover.Dropdown
-                            className="max-w-max"
-                            p={0}
-
-                        >
+                        <Popover.Dropdown className="max-w-max" p={0}>
                             <div onClick={() => setProfileTagOpened(false)}>
                                 <a
                                     href="/logout"

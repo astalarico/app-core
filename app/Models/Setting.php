@@ -28,7 +28,7 @@ class Setting extends Model implements HasMedia
 
         if( $settings ){
             $settings->app_api_tokens = unserialize( $settings->app_api_tokens );
-            $settings->app_logo = url('/') . $settings->getFirstMediaUrl('app_logo');
+            $settings->app_logo = $settings->getFirstMediaUrl('app_logo') ? url('/') . $settings->getFirstMediaUrl('app_logo') : null;
         }
     
         return $settings;

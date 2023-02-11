@@ -151,7 +151,7 @@ export default function GeneralSettings(props) {
         <div id="md-events-db-settings">
             <h2>General Settings</h2>
             <Grid>
-                <Grid.Col lg={5} md={12} className="max-w-[400px]">
+                <Grid.Col md={5} className="max-w-[400px]">
                     <TextInput
                         className="max-w-md mb-7 p-4 bg-white rounded-md"
                         {...form.getInputProps("app_name")}
@@ -226,10 +226,10 @@ export default function GeneralSettings(props) {
                         }
                     />
                 </Grid.Col>
-                <Grid.Col lg={6} md={12}>
+                <Grid.Col md={6}>
                     <div
                         id="app-api-tokens-list"
-                        className="bg-white px-4 pt-4 pb-2 rounded-md max-w-lg"
+                        className="bg-white px-4 pt-4 pb-2 rounded-md max-w-[350px] lg:max-w-lg "
                     >
                         <div className="flex items-center justify-between mb-4">
                             <div className="font-bold">API Tokens</div>
@@ -250,12 +250,12 @@ export default function GeneralSettings(props) {
                                         className="flex items-center mb-4"
                                         key={token.id}
                                     >
-                                        <div className="flex items-center">
+                                        <div className="flex items-center truncate">
                                             <IconKey
                                                 size={20}
                                                 className="mr-4"
                                             />
-                                            <div className="text-sm token-text truncate">
+                                            <div className="text-sm token-text">
                                                 {token.bearer}
                                             </div>
                                         </div>

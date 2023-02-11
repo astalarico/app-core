@@ -2,5 +2,9 @@ import { atom } from 'recoil';
 
 export const appDataState = atom({
     key: 'appDataState',
-    default: {},
+    default: {
+        navDrawerOpened : false,
+        user : {},
+        settings: {},
+    },
 });
