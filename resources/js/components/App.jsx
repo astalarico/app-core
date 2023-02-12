@@ -45,7 +45,11 @@ export default function App(props) {
                             navDrawerOpened: false,
                         })
                     }
-                    padding="xl"
+                    styles={{
+                        header: { position : 'absolute', right: 10},
+                        body: { height: '100%'}
+                    }}
+                    padding="xs"
                     size="lg"
                 >
                     <Navigation />

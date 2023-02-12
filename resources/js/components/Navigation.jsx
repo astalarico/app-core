@@ -27,7 +27,7 @@ export default function NavigationItems() {
                         />
                     )}
                     {!appData.settings?.app_logo && (
-                        <div className="text-2xl font-bold text-slate-800 p-4 border-1 border-dashed border-slate-300 max-h-full h-[90px] flex items-center">
+                        <div className="text-2xl font-bold text-slate-800 p-4 border-1 border-dashed border-slate-300 max-h-full h-[90px] flex items-center rounded-md">
                             Logo Here
                         </div>
                     )}

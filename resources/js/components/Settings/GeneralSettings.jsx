@@ -48,6 +48,7 @@ export default function GeneralSettings(props) {
             google_maps_api_key: "",
             app_api_tokens: [],
             app_logo: "",
+            open_ai_key : ""
         },
     });
 
@@ -151,10 +152,10 @@ export default function GeneralSettings(props) {
     };
 
     return (
-        <div id="md-events-db-settings" className="max-w-md lg:max-w-6xl">
+        <div id="md-events-db-settings">
             <h2>General Settings</h2>
-            <Grid>
-                <Grid.Col md={5} className="max-w-[350px] lg:max-w-lg">
+            <Grid className="flex max-w-lg md:max-w-5xl">
+                <Grid.Col md={6} className="">
                     <TextInput
                         className="mb-7 p-4 bg-white rounded-md"
                         {...form.getInputProps("app_name")}
@@ -175,7 +176,7 @@ export default function GeneralSettings(props) {
                         }
                         name="app_name"
                     />
-                    <div className="file-upload-wrapper  bg-white p-4 rounded-md mb-7">
+                    <div className="file-upload-wrapper bg-white p-4 rounded-md mb-7">
                         <FieldLabel
                             Icon={IconPhotoUp}
                             label="App Logo"
@@ -207,7 +208,7 @@ export default function GeneralSettings(props) {
                         />
                     </div>
                     <TextInput
-                        className=" mb-7 p-4 bg-white rounded-md"
+                        className="mb-7 p-4 bg-white rounded-md"
                         {...form.getInputProps("google_maps_api_key")}
                         label={
                             <FieldLabel
@@ -229,7 +230,7 @@ export default function GeneralSettings(props) {
                         }
                     />
                 </Grid.Col>
-                <Grid.Col md={6} className="max-w-[350px] lg:max-w-lg">
+                <Grid.Col md={6} className="">
                     <div
                         id="app-api-tokens-list"
                         className="bg-white px-4 pt-4 pb-2 rounded-md mb-7 min-h-[95px]"
