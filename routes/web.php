@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\SettingController;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\Setting;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +68,7 @@ Route::middleware('auth')->group(function () {
             'user' => $user,
             'settings' => $settings,
             'appUrl' => url('/'),
+            'users' => User::all(),
         ]);
     });
 

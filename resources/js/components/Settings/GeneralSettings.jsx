@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { TextInput, Button, Tooltip, ActionIcon } from "@mantine/core";
+import { TextInput, Button, Tooltip, Grid, Select } from "@mantine/core";
 import { useForm } from "@mantine/form";
-
+import { dataArrayToSelectOptions } from "@/utility";
 import {
     IconBrandGoogleDrive,
     IconKey,
@@ -10,13 +10,12 @@ import {
     IconWriting,
     IconPhotoUp,
     IconAffiliate,
-    IconApiApp,
+    IconAddressBook,
     IconPlus,
 } from "@tabler/icons";
 import FieldLabel from "../FieldLabel";
 import "./settings.scss";
 import Swal from "sweetalert2";
-import { Grid } from "@mantine/core";
 import { FilePond, registerPlugin } from "react-filepond";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond/dist/filepond.min.css";
@@ -37,10 +36,10 @@ const Toast = Swal.mixin({
 });
 
 export default function GeneralSettings(props) {
-    const [ appData, setAppData ] = useRecoilState(appDataState)
+    const [appData, setAppData] = useRecoilState(appDataState);
     const [settingsId, setSettingsId] = useState(0);
     const [files, setFiles] = useState([]);
-    const [ settings, setSettings ] = useState({});
+    const [settings, setSettings] = useState({});
 
     const form = useForm({
         initialValues: {
@@ -48,15 +47,19 @@ export default function GeneralSettings(props) {
             google_maps_api_key: "",
             app_api_tokens: [],
             app_logo: "",
-            open_ai_key : ""
+            open_ai_key: "",
+            admin_contact: "",
         },
     });
 
     useEffect(() => {
         axios.get("/data/settings").then((response) => {
             setSettings(response.data);
-     
-            if (response.data.app_logo && response.data.app_logo !== "undefined") {
+
+            if (
+                response.data.app_logo &&
+                response.data.app_logo !== "undefined"
+            ) {
                 setFiles([
                     {
                         source: response.data.app_logo,
@@ -68,11 +71,8 @@ export default function GeneralSettings(props) {
             form.setValues(response.data);
         });
     }, []);
-   
-    useEffect(() => {
-     
-      
-    }, [settings,files]);
+
+    useEffect(() => {}, [settings, files]);
 
     const addToken = () => {
         axios.get("/data/create-api-token").then((response) => {
@@ -137,7 +137,7 @@ export default function GeneralSettings(props) {
             setAppData({
                 ...appData,
                 settings: response.data,
-            })
+            });
             Toast.fire({
                 icon: "success",
                 title: `Settings Updated`,
@@ -231,26 +231,70 @@ export default function GeneralSettings(props) {
                     />
                 </Grid.Col>
                 <Grid.Col md={6} className="">
+                    <Select
+                        data={dataArrayToSelectOptions( appData.users)}
+                        className="mb-2 bg-white p-4 rounded-md"
+                        label={
+                            <FieldLabel
+                                Icon={IconAddressBook}
+                                label="Admin Contact"
+                                SaveButton={
+                                    <SaveButton
+                                        saveSetting={saveSetting}
+                                        settingKey={"admin_contact"}
+                                    />
+                                }   
+                            />
+                        }
+                        {...form.getInputProps("admin_contact")}
+                        onChange={(userId) =>
+                            updateFormValues(
+                                "admin_contact",
+                                userId
+                            )
+                        }
+                    />
+                    <TextInput
+                        className=" mb-2 p-4 bg-white rounded-md"
+                        {...form.getInputProps("open_ai_key")}
+                        label={
+                            <FieldLabel
+                                Icon={IconAffiliate}
+                                label="Open AI Key"
+                                SaveButton={
+                                    <SaveButton
+                                        saveSetting={saveSetting}
+                                        settingKey={"open_ai_key"}
+                                    />
+                                }
+                            />
+                        }
+                        onChange={(event) =>
+                            updateFormValues(
+                                "google_maps_api_key",
+                                event.target.value
+                            )
+                        }
+                    />
                     <div
                         id="app-api-tokens-list"
                         className="bg-white px-4 pt-4 pb-2 rounded-md mb-2 min-h-[95px]"
                     >
                         <div className="flex items-center justify-between mb-4">
-                        <FieldLabel
+                            <FieldLabel
                                 Icon={IconShieldLock}
                                 label="API Tokens"
                                 SaveButton={
                                     <Button
-                                    size="xs"
-                                    color="green"
-                                    onClick={addToken}
-                                    leftIcon={<IconPlus />}
-                                >
-                                    Add Token
-                                </Button>
+                                        size="xs"
+                                        color="green"
+                                        onClick={addToken}
+                                        leftIcon={<IconPlus />}
+                                    >
+                                        Add Token
+                                    </Button>
                                 }
                             />
-                      
                         </div>
 
                         <div className="" id="app-api-tokens">
@@ -289,28 +333,6 @@ export default function GeneralSettings(props) {
                             })}
                         </div>
                     </div>
-                    <TextInput
-                        className=" mb-2 p-4 bg-white rounded-md"
-                        {...form.getInputProps("open_ai_key")}
-                        label={
-                            <FieldLabel
-                                Icon={IconAffiliate}
-                                label="Open AI Key"
-                                SaveButton={
-                                    <SaveButton
-                                        saveSetting={saveSetting}
-                                        settingKey={"open_ai_key"}
-                                    />
-                                }
-                            />
-                        }
-                        onChange={(event) =>
-                            updateFormValues(
-                                "google_maps_api_key",
-                                event.target.value
-                            )
-                        }
-                    />
                 </Grid.Col>
             </Grid>
         </div>

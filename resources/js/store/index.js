@@ -6,5 +6,6 @@ export const appDataState = atom({
         navDrawerOpened : false,
         user : {},
         settings: {},
+        users: [],
     },
 });
