@@ -22,6 +22,10 @@ class Setting extends Model implements HasMedia
         });
     }
 
+    public function adminContact(){
+        return $this->hasOne(User::class, 'admin_contact');
+    }
+    
     public static function getSettings()
     {
         $settings = Setting::orderBy('id', 'desc')->first();

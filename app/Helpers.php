@@ -1,4 +1,5 @@
 <?php
+use App\Models\Setting;
 
 if ( !function_exists('convertNullToEmptyString') ) {
 
@@ -14,4 +15,12 @@ if ( !function_exists('convertNullToEmptyString') ) {
 
         return $model;
     }
+}
+
+if( ! function_exists('getSettings') ){
+    
+        function getSettings()
+        {
+           return Setting::getSettings();
+        }
 }

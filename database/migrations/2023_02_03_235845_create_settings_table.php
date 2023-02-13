@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('app_name')->nullable()->default('');
             $table->string('app_logo')->nullable()->default('');
             $table->string('open_ai_key')->nullable()->default('');
+            $table->foreignId('admin_contact')->nullable()->constrained('users')->onDelete('cascade');
         });
     }
 
