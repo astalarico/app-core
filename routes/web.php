@@ -16,6 +16,8 @@ use App\Http\Controllers\SettingController;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\Setting;
 use App\Models\User;
+use Orhanerday\OpenAi\OpenAi;
+use RRule\RSet;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,22 +29,23 @@ use App\Models\User;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::middleware('guest')->group(function () {
 
     // splash page
     Route::get('/', function () {
         return view('welcome');
-    }); 
+    });
 
     // login page
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])
-                    ->name('login');
+        ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
     // register page
     Route::get('/register', [RegisteredUserController::class, 'create'])
-                    ->name('register');
+        ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store']);
     // forgot password route
@@ -58,12 +61,40 @@ Route::middleware('auth')->group(function () {
     Route::get('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     // Data routes
-    Route::get('/data/init', function(Request $request){
+    Route::get('/data/init', function (Request $request) {
+
+        $open_ai_key = getSettings()->open_ai_key;
+        $open_ai = new OpenAi($open_ai_key);
+        $completion = $open_ai->completion([
+            'model' => 'text-davinci-003',
+            //'prompt' => "create an rrule string for event occurring $request->repeatingText starting $request->endDate until $request->endDate",
+            'prompt' => "create an rrule string for an event occurring every monday and friday except for 2030-03-17 until 2030-12-31",
+            'temperature' => 0,
+            'max_tokens' => 256,
+            'frequency_penalty' => 0,
+            'presence_penalty' => 0,
+            'top_p' => 1,
+        ]);
+
+        $aiResponse = json_decode($completion, true);
+        $rruleString = trim($aiResponse['choices'][0]['text']);
+        $rruleStringData = str_replace( 'RRULE:', '', $aiResponse['choices'][0]['text']);
+        $rruleArray = explode(';', trim($rruleStringData));
+        // $rruleString = str_replace( 'RRULE:', '', $aiResponse['choices'][0]['text']);
+        // $rruleString = str_replace( 'RRULE:', '', $aiResponse['choices'][0]['text']);
+        $eventDateTime = new \DateTime('2022-12-01', new \DateTimeZone('UTC'));
+        info( $rruleArray );
+        $rrule = new RSet( $rruleString);
+        $occurrences = $rrule->getOccurrences();
+
+        foreach( $occurrences as $occurrence){
+            info( $occurrence->format('Y-m-d H:i:s') );
+        }
         $user = $request->user();
         $user->roles = $user->roles()->get()->pluck('name');
 
         $settings = Setting::getSettings();
-  
+
         return response()->json([
             'user' => $user,
             'settings' => $settings,
