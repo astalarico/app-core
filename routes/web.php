@@ -63,12 +63,17 @@ Route::middleware('auth')->group(function () {
     // Data routes
     Route::get('/data/init', function (Request $request) {
 
+        // rrule string for every month on the 1st and 30th until 2023-12-31
+
+
+
+
         $open_ai_key = getSettings()->open_ai_key;
         $open_ai = new OpenAi($open_ai_key);
         $completion = $open_ai->completion([
             'model' => 'text-davinci-003',
             //'prompt' => "create an rrule string for event occurring $request->repeatingText starting $request->endDate until $request->endDate",
-            'prompt' => "create an rrule string for an event occurring every monday and friday except for 2023-03-17 until 2023-12-31",
+            'prompt' => "create an rrule string for an event occurring every month on the 1st and 30th until 2023-12-31",
             'temperature' => 0,
             'max_tokens' => 256,
             'frequency_penalty' => 0,
@@ -77,44 +82,59 @@ Route::middleware('auth')->group(function () {
         ]);
 
         $aiResponse = json_decode($completion, true);
-        $rruleString = trim($aiResponse['choices'][0]['text']);
-        $rruleStringData = str_replace( 'RRULE:', '', $aiResponse['choices'][0]['text']);
-        $rruleArray = explode(';', trim($rruleStringData));
-        // $rruleString = str_replace( 'RRULE:', '', $aiResponse['choices'][0]['text']);
-        // $rruleString = str_replace( 'RRULE:', '', $aiResponse['choices'][0]['text']);
-        $eventDateTime = new \DateTime('2022-12-01', new \DateTimeZone('UTC'));
+        if ( ! array_key_exists( 'error', $aiResponse ) ) {
+            info( $aiResponse );
+            $rruleString = trim($aiResponse['choices'][0]['text']);
 
-        $ruleRuleArrayFiltered = array_filter($rruleArray, function($item) {
-            return ! str_contains($item, 'EXDATE');
-        });
-        
-        $excludeDates = array_filter($rruleArray, function($item) {
-            return str_contains($item, 'EXDATE');
-        });
+            $rruleStringData = str_replace('RRULE:', '', $aiResponse['choices'][0]['text']);
+            $rruleArray = explode(';', trim($rruleStringData));
+            // $rruleString = str_replace( 'RRULE:', '', $aiResponse['choices'][0]['text']);
+            // $rruleString = str_replace( 'RRULE:', '', $aiResponse['choices'][0]['text']);
+            $eventDateTime = new \DateTime('2022-12-01', new \DateTimeZone('UTC'));
 
-        $rruleConfig = [];
 
-        foreach( $ruleRuleArrayFiltered as $filtered ){
-            $rruleClause = explode('=', $filtered);
-            $rruleConfig[$rruleClause[0]] = $rruleClause[1];
-        }
+            $ruleRuleArrayFiltered = array_filter($rruleArray, function ($item) {
+                return !str_contains($item, 'EXDATE');
+            });
 
-        if( count( $excludeDates ) > 0 ){
-            foreach( $excludeDates as $excludeDate ){
-              $excludeDateTime = new \DateTime($excludeDate, new \DateTimeZone('UTC'));
-              info( $excludeDateTime->format('Y-m-d H:i:s'));
+            $excludeDatesArray = array_filter($rruleArray, function ($item) {
+                return str_contains($item, 'EXDATE');
+            });
+
+            $rruleConfig = [];
+            foreach ($ruleRuleArrayFiltered as $filtered) {
+                $rruleClause = explode('=', $filtered);
+                $rruleConfig[$rruleClause[0]] = $rruleClause[1];
             }
+
+            $rruleConfig['DTSTART'] = $eventDateTime;
+            $rset = new RSet();
+            $rset->addRRule($rruleConfig);
+   
+            $excludeDatesExploded = [];
+            if (count($excludeDatesArray) > 0) {
+                foreach ($excludeDatesArray as $excludeDateString) {
+                    $excludeDates = str_replace('EXDATE=', '', $excludeDateString);
+                    $excludeDatesExploded = explode(',', $excludeDates);
+                }
+            }
+
+            if( count($excludeDatesExploded) > 0 ){
+                foreach ($excludeDatesExploded as $excludeDate) {
+                    info( ( new \DateTime($excludeDate, new \DateTimeZone('UTC') ) )->format('Y-m-d') ) ;
+                    $rset->addExDate(new \DateTime($excludeDate, new \DateTimeZone('UTC')));
+                }
+            }
+
+            $occurrences = $rset->getOccurrences();
+
+            foreach ($occurrences as $occurrence) {
+                info($occurrence->format('Y-m-d H:i:s'));
+            }
+        } else {
+            info( $aiResponse['error'] );
         }
 
-     
-        $rruleConfig['DTSTART'] = $eventDateTime;
-        $rset = new RSet();
-        $rset->addRRule($rruleConfig);
-        $occurrences = $rset->getOccurrences();
-
-        foreach( $occurrences as $occurrence){
-            info( $occurrence->format('Y-m-d H:i:s') );
-        }
         $user = $request->user();
         $user->roles = $user->roles()->get()->pluck('name');
 
