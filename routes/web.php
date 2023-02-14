@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
         $completion = $open_ai->completion([
             'model' => 'text-davinci-003',
             //'prompt' => "create an rrule string for event occurring $request->repeatingText starting $request->endDate until $request->endDate",
-            'prompt' => "create an rrule string for an event occurring every monday and friday except for 2030-03-17 until 2030-12-31",
+            'prompt' => "create an rrule string for an event occurring every monday and friday except for 2023-03-17 until 2023-12-31",
             'temperature' => 0,
             'max_tokens' => 256,
             'frequency_penalty' => 0,
@@ -83,9 +83,34 @@ Route::middleware('auth')->group(function () {
         // $rruleString = str_replace( 'RRULE:', '', $aiResponse['choices'][0]['text']);
         // $rruleString = str_replace( 'RRULE:', '', $aiResponse['choices'][0]['text']);
         $eventDateTime = new \DateTime('2022-12-01', new \DateTimeZone('UTC'));
-        info( $rruleArray );
-        $rrule = new RSet( $rruleString);
-        $occurrences = $rrule->getOccurrences();
+
+        $ruleRuleArrayFiltered = array_filter($rruleArray, function($item) {
+            return ! str_contains($item, 'EXDATE');
+        });
+        
+        $excludeDates = array_filter($rruleArray, function($item) {
+            return str_contains($item, 'EXDATE');
+        });
+
+        $rruleConfig = [];
+
+        foreach( $ruleRuleArrayFiltered as $filtered ){
+            $rruleClause = explode('=', $filtered);
+            $rruleConfig[$rruleClause[0]] = $rruleClause[1];
+        }
+
+        if( count( $excludeDates ) > 0 ){
+            foreach( $excludeDates as $excludeDate ){
+              $excludeDateTime = new \DateTime($excludeDate, new \DateTimeZone('UTC'));
+              info( $excludeDateTime->format('Y-m-d H:i:s'));
+            }
+        }
+
+     
+        $rruleConfig['DTSTART'] = $eventDateTime;
+        $rset = new RSet();
+        $rset->addRRule($rruleConfig);
+        $occurrences = $rset->getOccurrences();
 
         foreach( $occurrences as $occurrence){
             info( $occurrence->format('Y-m-d H:i:s') );

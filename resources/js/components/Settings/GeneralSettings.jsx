@@ -271,7 +271,7 @@ export default function GeneralSettings(props) {
                         }
                         onChange={(event) =>
                             updateFormValues(
-                                "google_maps_api_key",
+                                "open_ai_key",
                                 event.target.value
                             )
                         }
