@@ -254,28 +254,7 @@ export default function GeneralSettings(props) {
                             )
                         }
                     />
-                    <TextInput
-                        className=" mb-2 p-4 bg-white rounded-md"
-                        {...form.getInputProps("open_ai_key")}
-                        label={
-                            <FieldLabel
-                                Icon={IconAffiliate}
-                                label="Open AI Key"
-                                SaveButton={
-                                    <SaveButton
-                                        saveSetting={saveSetting}
-                                        settingKey={"open_ai_key"}
-                                    />
-                                }
-                            />
-                        }
-                        onChange={(event) =>
-                            updateFormValues(
-                                "open_ai_key",
-                                event.target.value
-                            )
-                        }
-                    />
+ 
                     <div
                         id="app-api-tokens-list"
                         className="bg-white px-4 pt-4 pb-2 rounded-md mb-2 min-h-[95px]"
